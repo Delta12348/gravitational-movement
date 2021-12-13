@@ -9,45 +9,66 @@ public class RotateAround : MonoBehaviour
     public double period;
     public double speedScale;
 
-    public int counter = -1;
+    public int counter;
 
-    public double gravitationalSpeed;
-    public double tangencialSpeed;
-    private double currentSpeed;
-    private double acceleration;
+    public bool tancencialInitialSpeed;
+    public double initialSpeed; 
 
     public Vector3 attractionVector;
     public Vector3 tangencialVector;
     public Vector3 currentVector;
 
+    public float m_Timer;
+
     private UniversalAttractionBehaviour attraction;
 
     private void Start()
     {
+        m_Timer = 0;
         attraction = GameObject.FindGameObjectWithTag("GameController").GetComponent<UniversalAttractionBehaviour>();
-        gravitationalSpeed = attraction.gravitationalSpeed / speedScale;
-        tangencialSpeed = attraction.gravitationalSpeed / speedScale;
-        acceleration = attraction.gravitationalAcceleration / speedScale;
-
-        currentSpeed = 0;
+        CheckIfTangencialSpeed();
+        Debug.Log(initialSpeed);
+        tangencialVector = Vector3.right * ((float)initialSpeed / (float)speedScale);
     }
     // Update is called once per frame
     void Update()
     {
-        CentripetalMovement();
-
+        GravitationalMovement();
+        UpdateTimer();
     }
     private void OnTriggerEnter(Collider other)
     {
         counter++;
+        if (counter > 0) period = m_Timer;
+        RestartTimer();
     }
-    private void CentripetalMovement()
+    private void GravitationalMovement()
     {
-        this.transform.LookAt(pivot);
-        this.transform.Translate((float)tangencialSpeed * new Vector3(1, 0, 0)* Time.deltaTime);
+        transform.LookAt(pivot);
+        attractionVector = Vector3.forward  * ((float)attraction.gravitationalAcceleration / (float)speedScale) * Time.deltaTime;
+        currentVector = tangencialVector + attractionVector;
+        transform.Translate(currentVector  * Time.deltaTime);
+        tangencialVector = currentVector;
+        UpdateCurrentDistance();
     }
     private void Rotate()
     {
         this.transform.RotateAround(pivot.position, Vector3.up, ((Mathf.PI * 2) / (float)(period / 10000)) * Mathf.Rad2Deg);
+    }
+    private void CheckIfTangencialSpeed()
+    {
+        if (tancencialInitialSpeed) initialSpeed = attraction.CalculateGravitationalSpeed();
+    }
+    private void UpdateCurrentDistance()
+    {
+        attraction.currentDistance = Vector3.Distance(this.transform.position, pivot.position) * attraction.objectScale;
+    }
+    private void RestartTimer()
+    {
+        m_Timer = 0;
+    }
+    private void UpdateTimer()
+    {
+        m_Timer += Time.deltaTime;
     }
 }

@@ -13,59 +13,50 @@ public class UniversalAttractionBehaviour : MonoBehaviour
 
     public double objectScale;
 
-    public double period;
-
-    public double distance;
+    public double initialDistance;
+    public double currentDistance;
 
     public double gravitationalConstant = 6.667E-11;
 
-    public double gravitationalSpeed;
-
-    public double userSpeed;
-
-    public double centripetalAcceleration;
     public double gravitationalAcceleration;
-
+ 
     private Transform trigger;
     // Start is called before the first frame update
     void Start()
     {
         trigger = GameObject.FindGameObjectWithTag("Trigger").transform;
-        gravitationalSpeed = CalculateGravitationalSpeed();
-        gravitationalAcceleration = CalculateGravitationaAcceleration();
-        centripetalAcceleration = CalculateCentripetalAcceleration(userSpeed);
-        period = CalculatePeriod(gravitationalSpeed);
-        SimulateDistance();
-        Debug.Log(period / 86400);
+        currentDistance = initialDistance + bigObject.radius + smallObject.radius;
+        SimulateInitialDistance();
     }
 
     // Update is called once per frame
     void Update()
     {
+        gravitationalAcceleration = CalculateGravitationaAcceleration();
 
     }
 
-    private void SimulateDistance()
+    private void SimulateInitialDistance()
     {
-        float simulatedDistance = ((float)distance / (float)objectScale);
+        float simulatedDistance = ((float)currentDistance / (float)objectScale);
         smallModel.position = new Vector3(simulatedDistance, 0, 0);
         trigger.position = new Vector3(simulatedDistance, 0, 0); 
     }
-    private double CalculateGravitationalSpeed()
+    public double CalculateGravitationalSpeed()
     {
-        return Math.Sqrt((gravitationalConstant * bigObject.mass) / (distance));
+        return Math.Sqrt((gravitationalConstant * bigObject.mass) / (currentDistance));
     }
-    private double CalculatePeriod(double speed)
+    public double CalculatePeriod(double speed)
     {
-        return (Math.PI * 2 * distance) / (speed);
+        return (Math.PI * 2 * currentDistance) / (speed);
     }
     private double CalculateGravitationaAcceleration()
     {
-        return (gravitationalConstant * bigObject.mass) / (distance * distance); 
+        return (gravitationalConstant * bigObject.mass) / (currentDistance * currentDistance); 
     }
     private double CalculateCentripetalAcceleration(double speed)
     {
-        return (speed * speed) / (distance);
+        return (speed * speed) / (currentDistance);
     }
     
 }
