@@ -21,10 +21,13 @@ public class UniversalAttractionBehaviour : MonoBehaviour
     public double gravitationalAcceleration;
  
     private Transform trigger;
+    private SphereCollider triggerCollider;
     // Start is called before the first frame update
     void Start()
     {
         trigger = GameObject.FindGameObjectWithTag("Trigger").transform;
+        triggerCollider = trigger.GetComponent<SphereCollider>();
+        triggerCollider.radius = (float)smallObject.radius / (float)objectScale;
         currentDistance = initialDistance + bigObject.radius + smallObject.radius;
         SimulateInitialDistance();
     }
@@ -33,7 +36,6 @@ public class UniversalAttractionBehaviour : MonoBehaviour
     void Update()
     {
         gravitationalAcceleration = CalculateGravitationaAcceleration();
-
     }
 
     private void SimulateInitialDistance()

@@ -39,13 +39,12 @@ public class RotateAround : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         counter++;
-        if (counter > 0) period = m_Timer;
+        if (counter > 0) period = m_Timer / speedScale * attraction.objectScale / 86400;
         RestartTimer();
     }
     private void GravitationalMovement()
     {
         transform.LookAt(pivot);
-        attractionVector = Vector3.forward  * ((float)attraction.gravitationalAcceleration / (float)speedScale) * Time.deltaTime;
         currentVector = tangencialVector + attractionVector;
         transform.Translate(currentVector  * Time.deltaTime);
         tangencialVector = currentVector;
